@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>はむチラ語ペディア</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fafafa;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(255, 154, 158, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stats-item {
+            display: inline-block;
+            margin: 0 20px;
+            color: #ff9a9e;
+            font-weight: bold;
+        }
+        
+        .search-box {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .search-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px 25px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .search-input:focus {
+            border-color: #ff9a9e;
+            box-shadow: 0 4px 20px rgba(255, 154, 158, 0.2);
+        }
+        
+        .category-filter {
+            margin-bottom: 30px;
+            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 10px 18px;
+            background: white;
+            border: 2px solid #ff9a9e;
+            border-radius: 25px;
+            color: #ff9a9e;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: #ff9a9e;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        }
+        
+        .term-count {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .term-list {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .term-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 25px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .term-item:last-child {
+            border-bottom: none;
+        }
+        
+        .term-item:hover {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff0f5 100%);
+            transform: translateX(5px);
+        }
+        
+        .term-item.has-detail:hover::after {
+            content: "👆 クリックで詳細表示";
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #ff9a9e;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .term-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .term-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .term-reading {
+            color: #666;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        .term-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .term-category {
+            background: #ff9a9e;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .has-detail-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        .has-youtube-badge {
+            background: #ff4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        .term-detail {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 35px;
+            margin: 20px 0;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            border: 3px solid #ff9a9e;
+        }
+        
+        .term-detail.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .detail-title {
+            font-size: 28px;
+            color: #ff9a9e;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #ff9a9e;
+            padding-bottom: 15px;
+        }
+        
+        .detail-reading {
+            color: #666;
+            margin-bottom: 20px;
+            font-style: italic;
+            font-size: 16px;
+        }
+        
+        .detail-category {
+            display: inline-block;
+            background: #ff9a9e;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 25px;
+        }
+        
+        .detail-description {
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff0f5 100%);
+            border-radius: 12px;
+            border-left: 5px solid #ff9a9e;
+        }
+        
+        .youtube-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #ff4444 0%, #cc3333 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            margin: 10px 10px 10px 0;
+            transition: all 0.3s;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+        }
+        
+        .youtube-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+        }
+        
+        .back-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #666 0%, #444 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(102, 102, 102, 0.3);
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 102, 102, 0.4);
+        }
+        
+        .suggestion-board {
+            margin-top: 50px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+            border: 2px solid #ff9a9e;
+        }
+        
+        .board-title {
+            color: #ff9a9e;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .suggestion-form {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 15px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #ff9a9e;
+        }
+        
+        .form-textarea {
+            height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #ff9a9e 0%, #ff7a7e 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+        }
+        
+        .suggestions-list {
+            border-top: 2px solid #f0f0f0;
+            padding-top: 20px;
+        }
+        
+        .suggestion-item {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff0f5 100%);
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border-left: 5px solid #ff9a9e;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .suggestion-author {
+            font-weight: bold;
+            color: #ff9a9e;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        
+        .suggestion-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: #999;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .stats-item {
+                display: block;
+                margin: 8px 0;
+            }
+            
+            .category-filter {
+                gap: 6px;
+            }
+            
+            .filter-btn {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+            
+            .term-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 16px 20px;
+            }
+            
+            .term-item.has-detail:hover::after {
+                display: none;
+            }
+            
+            .term-info {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .term-detail {
+                padding: 25px 20px;
+            }
+            
+            .detail-title {
+                font-size: 24px;
+            }
+            
+            .suggestion-board {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐹 はむチラ語ペディア</h1>
+            <p>みんなで作るはむスターたちの完全用語集</p>
+        </div>
+        
+        <div class="stats">
+            <span class="stats-item">📚 総用語数: <span id="totalTerms">8</span>件</span>
+            <span class="stats-item">✍️ 詳細説明: <span id="detailTerms">3</span>件</span>
+            <span class="stats-item">🎬 動画付き: <span id="youtubeTerms">1</span>件</span>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="🔍 用語を検索してね..." id="searchInput">
+        </div>
+        
+        <div class="category-filter">
+            <span class="filter-btn active" onclick="filterByCategory('all')">全て</span>
+            <span class="filter-btn" onclick="filterByCategory('愛称')">愛称</span>
+            <span class="filter-btn" onclick="filterByCategory('グループ名')">グループ名</span>
+            <span class="filter-btn" onclick="filterByCategory('イベント・選手権')">イベント・選手権</span>
+            <span class="filter-btn" onclick="filterByCategory('戦隊シリーズ')">戦隊シリーズ</span>
+            <span class="filter-btn" onclick="filterByCategory('族名')">族名</span>
+            <span class="filter-btn" onclick="filterByCategory('口癖')">口癖</span>
+            <span class="filter-btn" onclick="filterByCategory('特技')">特技</span>
+            <span class="filter-btn" onclick="filterByCategory('特徴')">特徴</span>
+            <span class="filter-btn" onclick="filterByCategory('育児法')">育児法</span>
+            <span class="filter-btn" onclick="filterByCategory('事件')">事件</span>
+        </div>
+        
+        <div class="term-count" id="termCount">8件の用語を表示中</div>
+        
+        <div id="termList" class="term-list">
+            <!-- ここにJavaScriptで用語リストが動的に生成されます -->
+        </div>
+        
+        <div id="noResults" class="no-results" style="display: none;">
+            🔍 該当する用語が見つかりませんでした<br>
+            <small>別のキーワードで検索してみてください</small>
+        </div>
+        
+        <!-- 詳細表示エリア -->
+        <div id="termDetails"></div>
+        
+        <!-- 要望掲示板 -->
+        <div class="suggestion-board">
+            <h3 class="board-title">📝 用語追加・要望掲示板</h3>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                新しい用語や詳しい説明の追加要望をお気軽にどうぞ！
+            </p>
+            <div class="suggestion-form">
+                <input type="text" class="form-input" placeholder="お名前（任意）" id="nameInput">
+                <input type="text" class="form-input" placeholder="追加したい用語名" id="termInput">
+                <textarea class="form-input form-textarea" placeholder="用語の説明や要望をお聞かせください！どんな場面で使われるかも教えてくれると嬉しいです🐹" id="suggestionInput"></textarea>
+                <button class="submit-btn" onclick="addSuggestion()">💌 投稿する</button>
+            </div>
+            
+            <div class="suggestions-list" id="suggestionsList">
+                <div class="suggestion-item">
+                    <div class="suggestion-author">はむファン1号さん</div>
+                    <div class="suggestion-text">「もふもふ3兄弟」の詳しい説明が欲しいです！どのはむスターたちのことですか？どんな特徴があるんでしょうか？</div>
+                </div>
+                
+                <div class="suggestion-item">
+                    <div class="suggestion-author">チラチラ大好きさん</div>
+                    <div class="suggestion-text">「びち族」について知りたいです。どんな特徴があるのか、どのはむちゃんたちが属しているのか教えてください！</div>
+                </div>
+                
+                <div class="suggestion-item">
+                    <div class="suggestion-author">はむはむ観察者さん</div>
+                    <div class="suggestion-text">「ゆらゆら族」の動画も見てみたいです！特徴的な動きをする子たちなんですよね？</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // CSVデータを読み込んで処理する
+        let allTerms = [];
+        let currentFilter = 'all';
+        let currentDetailTerm = null;
+        
+        // CSVデータを読み込み
+        async function loadTerms() {
+            try {
+                const csvContent = await window.fs.readFile('はむチラ語録.csv', { encoding: 'utf8' });
+                
+                // Papaparseでパース（注意：ライブラリが利用できない場合は手動パース）
+                const lines = csvContent.split('\n');
+                const headers = lines[0].split(',');
+                
+                allTerms = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',');
+                    if (values.length >= 3 && values[0].trim()) {
+                        const term = {
+                            name: values[0]?.trim() || '',
+                            reading: values[1]?.trim() || '',
+                            category: values[2]?.trim() || '',
+                            description: values[3]?.trim() || '',
+                            youtube: values[4]?.trim() || ''
+                        };
+                        if (term.name) {
+                            allTerms.push(term);
+                        }
+                    }
+                }
+                
+                // 50音順でソート
+                allTerms.sort((a, b) => a.reading.localeCompare(b.reading, 'ja'));
+                
+                updateStats();
+                renderTerms();
+                
+            } catch (error) {
+                console.error('CSVの読み込みに失敗しました:', error);
+                // フォールバック：サンプルデータを使用
+                loadSampleData();
+            }
+        }
+        
+        // サンプルデータ（CSVが読み込めない場合のフォールバック）
+        function loadSampleData() {
+            allTerms = [
+                {name: 'ぺしゃりねちゃん', reading: 'ぺしゃりねちゃん', category: '愛称', description: 'ぷらりねちゃんの愛称。とても人懐っこくておしゃべり好きな性格から付けられた愛称です。', youtube: ''},
+                {name: 'ぽん', reading: 'ぽん', category: '愛称', description: 'ふぉんでゅの愛称。たぬきに似ていることから付けられました。丸い体型とふわふわの毛が特徴的です。', youtube: 'https://www.youtube.com/watch?v=sample1'},
+                {name: 'こん', reading: 'こん', category: '愛称', description: 'アフォガートの愛称。きつねに似ていることから付けられました。賢そうな表情が印象的です。', youtube: ''},
+                {name: 'しゅくれの部屋', reading: 'しゅくれのへや', category: 'イベント・選手権', description: '', youtube: ''},
+                {name: 'もふもふ3兄弟', reading: 'もふもふさんきょうだい', category: 'グループ名', description: '', youtube: ''},
+                {name: 'はむはむ総選挙', reading: 'はむはむそうせんきょ', category: 'イベント・選手権', description: '', youtube: ''},
+                {name: 'びち族', reading: 'びちぞく', category: '族名', description: '', youtube: ''},
+                {name: '○○でしょう！', reading: 'まるまるでしょう！', category: '口癖', description: '', youtube: ''}
+            ];
+            
+            allTerms.sort((a, b) => a.reading.localeCompare(b.reading, 'ja'));
+            updateStats();
+            renderTerms();
+        }
+        
+        // 統計情報を更新
+        function updateStats() {
+            const totalTerms = allTerms.length;
+            const detailTerms = allTerms.filter(term => term.description).length;
+            const youtubeTerms = allTerms.filter(term => term.youtube).length;
+            
+            document.getElementById('totalTerms').textContent = totalTerms;
+            document.getElementById('detailTerms').textContent = detailTerms;
+            document.getElementById('youtubeTerms').textContent = youtubeTerms;
+        }
+        
+        // 用語リストを描画
+        function renderTerms() {
+            const termList = document.getElementById('termList');
+            const noResults = document.getElementById('noResults');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            // フィルタリング
+            let filteredTerms = allTerms.filter(term => {
+                const matchesCategory = currentFilter === 'all' || term.category === currentFilter;
+                const matchesSearch = !searchTerm || 
+                    term.name.toLowerCase().includes(searchTerm) || 
+                    term.reading.toLowerCase().includes(searchTerm) ||
+                    term.category.toLowerCase().includes(searchTerm) ||
+                    term.description.toLowerCase().includes(searchTerm);
+                return matchesCategory && matchesSearch;
+            });
+            
+            // 件数表示を更新
+            document.getElementById('termCount').textContent = `${filteredTerms.length}件の用語を表示中`;
+            
+            if (filteredTerms.length === 0) {
+                termList.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            termList.style.display = 'block';
+            noResults.style.display = 'none';
+            
+            // HTMLを生成（元の配列のインデックスを使用）
+            termList.innerHTML = filteredTerms.map(term => {
+                const hasDetail = term.description && term.description.trim();
+                const hasYoutube = term.youtube && term.youtube.trim();
+                const termIndex = allTerms.findIndex(t => t.name === term.name && t.reading === term.reading);
+                
+                return `
+                    <div class="term-item ${hasDetail ? 'has-detail' : ''}" 
+                         data-category="${term.category}"
+                         ${hasDetail ? `onclick="showDetail(${termIndex})"` : ''}>
+                        <div class="term-info">
+                            <span class="term-name">${term.name}</span>
+                            <span class="term-reading">（${term.reading}）</span>
+                        </div>
+                        <div class="term-badges">
+                            <span class="term-category">${term.category}</span>
+                            ${hasDetail ? '<span class="has-detail-badge">詳細</span>' : ''}
+                            ${hasYoutube ? '<span class="has-youtube-badge">動画</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // 詳細ページを全用語で生成（一度だけ）
+            generateAllDetailPages();
+        }
+        
+        // 全ての詳細ページを生成（一度だけ実行）
+        function generateAllDetailPages() {
+            const detailsContainer = document.getElementById('termDetails');
+            
+            // 詳細説明がある用語のみ
+            const termsWithDetails = allTerms.filter(term => term.description && term.description.trim());
+            
+            detailsContainer.innerHTML = termsWithDetails.map((term, index) => {
+                const termIndex = allTerms.findIndex(t => t.name === term.name && t.reading === term.reading);
+                const hasYoutube = term.youtube && term.youtube.trim();
+                
+                return `
+                    <div id="detail-${termIndex}" class="term-detail">
+                        <h2 class="detail-title">${term.name}</h2>
+                        <p class="detail-reading">${term.reading}</p>
+                        <span class="detail-category">${term.category}</span>
+                        <div class="detail-description">
+                            ${term.description}
+                        </div>
+                        ${hasYoutube ? `<a href="${term.youtube}" target="_blank" class="youtube-link">🎬 関連動画を見る</a>` : ''}
+                        <div class="back-btn" onclick="hideDetail()">← 一覧に戻る</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 詳細表示
+        function showDetail(termIndex) {
+            const termList = document.getElementById('termList');
+            const termCount = document.getElementById('termCount');
+            const allDetails = document.querySelectorAll('.term-detail');
+            
+            // 一覧を非表示
+            termList.style.display = 'none';
+            termCount.style.display = 'none';
+            
+            // 全ての詳細を非表示
+            allDetails.forEach(detail => detail.classList.remove('active'));
+            
+            // 指定された詳細を表示
+            const targetDetail = document.getElementById('detail-' + termIndex);
+            if (targetDetail) {
+                targetDetail.classList.add('active');
+                currentDetailTerm = termIndex;
+                // 詳細表示位置にスムーズスクロール
+                targetDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // 詳細非表示
+        function hideDetail() {
+            const termList = document.getElementById('termList');
+            const termCount = document.getElementById('termCount');
+            const allDetails = document.querySelectorAll('.term-detail');
+            
+            // 詳細を非表示
+            allDetails.forEach(detail => detail.classList.remove('active'));
+            
+            // 一覧を表示
+            termList.style.display = 'block';
+            termCount.style.display = 'block';
+            currentDetailTerm = null;
+            
+            // 一覧位置にスムーズスクロール
+            termList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // カテゴリフィルター
+        function filterByCategory(category) {
+            currentFilter = category;
+            
+            // ボタンのアクティブ状態を更新
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 詳細表示中の場合は一覧に戻る
+            if (currentDetailTerm) {
+                hideDetail();
+            }
+            
+            renderTerms();
+        }
+        
+        // 検索機能
+        document.getElementById('searchInput').addEventListener('input', function() {
+            // 詳細表示中の場合は一覧に戻る
+            if (currentDetailTerm) {
+                hideDetail();
+            }
+            renderTerms();
+        });
+        
+        // 要望投稿機能
+        function addSuggestion() {
+            const name = document.getElementById('nameInput').value || '匿名さん';
+            const term = document.getElementById('termInput').value;
+            const suggestion = document.getElementById('suggestionInput').value;
+            
+            if (!suggestion.trim()) {
+                alert('要望内容を入力してください！');
+                return;
+            }
+            
+            const suggestionItem = document.createElement('div');
+            suggestionItem.className = 'suggestion-item';
+            suggestionItem.innerHTML = `
+                <div class="suggestion-author">${name}</div>
+                <div class="suggestion-text">${term ? `【${term}】` : ''}${suggestion}</div>
+            `;
+            
+            const suggestionsList = document.getElementById('suggestionsList');
+            suggestionsList.insertBefore(suggestionItem, suggestionsList.firstChild);
+            
+            // フォームをクリア
+            document.getElementById('nameInput').value = '';
+            document.getElementById('termInput').value = '';
+            document.getElementById('suggestionInput').value = '';
+            
+            // 投稿完了のアニメーション
+            suggestionItem.style.transform = 'translateY(-20px)';
+            suggestionItem.style.opacity = '0';
+            setTimeout(() => {
+                suggestionItem.style.transition = 'all 0.3s ease-out';
+                suggestionItem.style.transform = 'translateY(0)';
+                suggestionItem.style.opacity = '1';
+            }, 100);
+            
+            alert('投稿ありがとうございます！🐹✨');
+        }
+        
+        // ページ読み込み時に初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTerms();
+        });
+        
+        // キーボードショートカット
+        document.addEventListener('keydown', function(e) {
+            // Escキーで詳細を閉じる
+            if (e.key === 'Escape' && currentDetailTerm) {
+                hideDetail();
+            }
+            
+            // Ctrl+F または Cmd+F で検索にフォーカス
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+        
+        // スムーズスクロールのためのポリフィル（古いブラウザ対応）
+        if (!('scrollBehavior' in document.documentElement.style)) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js';
+            document.head.appendChild(script);
+            script.onload = function() {
+                window.__forceSmoothScrollPolyfill__ = true;
+                smoothscroll.polyfill();
+            };
+        }
+    </script>
+</body>
+</html>
