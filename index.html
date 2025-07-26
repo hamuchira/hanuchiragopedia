@@ -552,40 +552,112 @@
         // CSVデータを読み込み
         async function loadTerms() {
             try {
-                const csvContent = await window.fs.readFile('はむチラ語録.csv', { encoding: 'utf8' });
+                console.log('CSVファイルの読み込みを開始...');
                 
-                // Papaparseでパース（注意：ライブラリが利用できない場合は手動パース）
-                const lines = csvContent.split('\n');
-                const headers = lines[0].split(',');
-                
-                allTerms = [];
-                for (let i = 1; i < lines.length; i++) {
-                    const values = lines[i].split(',');
-                    if (values.length >= 3 && values[0].trim()) {
-                        const term = {
-                            name: values[0]?.trim() || '',
-                            reading: values[1]?.trim() || '',
-                            category: values[2]?.trim() || '',
-                            description: values[3]?.trim() || '',
-                            youtube: values[4]?.trim() || ''
-                        };
-                        if (term.name) {
-                            allTerms.push(term);
-                        }
-                    }
+                // まずfetch APIを試す
+                const response = await fetch('./hamuchira_terms.csv');
+                if (!response.ok) {
+                    throw new Error('CSV fetch failed: ' + response.status);
                 }
+                const csvContent = await response.text();
+                console.log('CSVファイル読み込み成功:', csvContent.length + ' 文字');
                 
-                // 50音順でソート
-                allTerms.sort((a, b) => a.reading.localeCompare(b.reading, 'ja'));
-                
-                updateStats();
-                renderTerms();
+                parseCSVContent(csvContent);
                 
             } catch (error) {
-                console.error('CSVの読み込みに失敗しました:', error);
-                // フォールバック：サンプルデータを使用
-                loadSampleData();
+                console.error('CSV読み込みエラー:', error);
+                console.log('フォールバック: window.fs.readFileを試行...');
+                
+                try {
+                    // フォールバック: window.fs.readFile
+                    const csvContent = await window.fs.readFile('hamuchira_terms.csv', { encoding: 'utf8' });
+                    console.log('window.fs.readFile成功:', csvContent.length + ' 文字');
+                    parseCSVContent(csvContent);
+                    
+                } catch (fsError) {
+                    console.error('window.fs.readFileもエラー:', fsError);
+                    console.log('サンプルデータを使用します');
+                    loadSampleData();
+                }
             }
+        }
+        
+        // CSVコンテンツをパースする関数
+        function parseCSVContent(csvContent) {
+            console.log('CSVパース開始...');
+            
+            const lines = csvContent.split('\n').filter(line => line.trim());
+            console.log('CSVの行数:', lines.length);
+            
+            if (lines.length < 2) {
+                console.error('CSVファイルが空または不正です');
+                loadSampleData();
+                return;
+            }
+            
+            // ヘッダー行をスキップして処理
+            allTerms = [];
+            for (let i = 1; i < lines.length; i++) {
+                // CSVパース（カンマ区切り、ダブルクォート対応）
+                const row = parseCSVLine(lines[i]);
+                
+                if (row.length >= 3 && row[0] && row[0].trim()) {
+                    const term = {
+                        name: row[0]?.trim() || '',
+                        reading: row[1]?.trim() || '',
+                        category: row[2]?.trim() || '',
+                        description: row[3]?.trim() || '',
+                        youtube: row[4]?.trim() || ''
+                    };
+                    
+                    if (term.name) {
+                        allTerms.push(term);
+                    }
+                }
+            }
+            
+            console.log('パース完了:', allTerms.length + '件の用語');
+            
+            if (allTerms.length === 0) {
+                console.error('有効な用語が見つかりませんでした');
+                loadSampleData();
+                return;
+            }
+            
+            // 50音順でソート
+            allTerms.sort((a, b) => a.reading.localeCompare(b.reading, 'ja'));
+            
+            updateStats();
+            renderTerms();
+        }
+        
+        // CSV行をパースする関数（ダブルクォート対応）
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        current += '"';
+                        i++; // skip next quote
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current);
+            return result;
         }
         
         // サンプルデータ（CSVが読み込めない場合のフォールバック）
