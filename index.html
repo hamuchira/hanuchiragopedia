@@ -128,9 +128,7 @@
         }
         
         .term-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: block;
             padding: 18px 25px;
             border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
@@ -144,10 +142,9 @@
         
         .term-item:hover {
             background: linear-gradient(135deg, #f8f9ff 0%, #fff0f5 100%);
-            transform: translateX(5px);
         }
         
-        .term-item.has-detail:hover::after {
+        .term-item.has-detail:hover .term-info::after {
             content: "👆 クリックで詳細表示";
             position: absolute;
             right: 25px;
@@ -159,6 +156,12 @@
             padding: 4px 8px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .term-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .term-info {
@@ -214,82 +217,88 @@
         
         .term-detail {
             display: none;
-            background: white;
-            border-radius: 15px;
-            padding: 35px;
-            margin: 20px 0;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-            border: 3px solid #ff9a9e;
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff0f5 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 15px 25px 20px 25px;
+            box-shadow: inset 0 2px 10px rgba(255, 154, 158, 0.1);
+            border-left: 5px solid #ff9a9e;
+            animation: slideDown 0.3s ease-out;
         }
         
         .term-detail.active {
             display: block;
-            animation: slideIn 0.3s ease-out;
         }
         
-        @keyframes slideIn {
+        @keyframes slideDown {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin-top: 0;
+                margin-bottom: 0;
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                max-height: 500px;
+                padding-top: 25px;
+                padding-bottom: 25px;
+                margin-top: 15px;
+                margin-bottom: 20px;
             }
         }
         
         .detail-title {
-            font-size: 28px;
+            font-size: 22px;
             color: #ff9a9e;
-            margin-bottom: 10px;
-            border-bottom: 3px solid #ff9a9e;
-            padding-bottom: 15px;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #ff9a9e;
+            padding-bottom: 8px;
         }
         
         .detail-reading {
             color: #666;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             font-style: italic;
-            font-size: 16px;
+            font-size: 14px;
         }
         
         .detail-category {
             display: inline-block;
             background: #ff9a9e;
             color: white;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
             font-weight: 500;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
         
         .detail-description {
-            font-size: 17px;
-            line-height: 1.8;
-            margin-bottom: 25px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f8f9ff 0%, #fff0f5 100%);
-            border-radius: 12px;
-            border-left: 5px solid #ff9a9e;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            color: #444;
         }
         
         .youtube-link {
             display: inline-block;
-            padding: 12px 25px;
+            padding: 8px 16px;
             background: linear-gradient(135deg, #ff4444 0%, #cc3333 100%);
             color: white;
             text-decoration: none;
-            border-radius: 25px;
-            margin: 10px 10px 10px 0;
+            border-radius: 15px;
+            margin: 8px 0;
             transition: all 0.3s;
             font-weight: 500;
-            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+            font-size: 13px;
+            box-shadow: 0 3px 10px rgba(255, 68, 68, 0.3);
         }
         
         .youtube-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
         }
         
         .back-btn {
@@ -727,22 +736,34 @@
                 return `
                     <div class="term-item ${hasDetail ? 'has-detail' : ''}" 
                          data-category="${term.category}"
-                         ${hasDetail ? `onclick="showDetail(${termIndex})"` : ''}>
-                        <div class="term-info">
-                            <span class="term-name">${term.name}</span>
-                            <span class="term-reading">（${term.reading}）</span>
+                         data-term-index="${termIndex}">
+                        
+                        <div class="term-header" ${hasDetail ? `onclick="toggleDetail(${termIndex})"` : ''}>
+                            <div class="term-info">
+                                <span class="term-name">${term.name}</span>
+                                <span class="term-reading">（${term.reading}）</span>
+                            </div>
+                            <div class="term-badges">
+                                <span class="term-category">${term.category}</span>
+                                ${hasDetail ? '<span class="has-detail-badge">詳細</span>' : ''}
+                                ${hasYoutube ? '<span class="has-youtube-badge">動画</span>' : ''}
+                            </div>
                         </div>
-                        <div class="term-badges">
-                            <span class="term-category">${term.category}</span>
-                            ${hasDetail ? '<span class="has-detail-badge">詳細</span>' : ''}
-                            ${hasYoutube ? '<span class="has-youtube-badge">動画</span>' : ''}
-                        </div>
+                        
+                        ${hasDetail ? `
+                            <div id="detail-${termIndex}" class="term-detail">
+                                <h3 class="detail-title">${term.name}</h3>
+                                <p class="detail-reading">${term.reading}</p>
+                                <span class="detail-category">${term.category}</span>
+                                <div class="detail-description">
+                                    ${term.description}
+                                </div>
+                                ${hasYoutube ? `<a href="${term.youtube}" target="_blank" class="youtube-link">🎬 関連動画を見る</a>` : ''}
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
-            
-            // 詳細ページを全用語で生成（一度だけ）
-            generateAllDetailPages();
         }
         
         // 全ての詳細ページを生成（一度だけ実行）
@@ -771,26 +792,16 @@
             }).join('');
         }
         
-        // 詳細表示
-        function showDetail(termIndex) {
-            const termList = document.getElementById('termList');
-            const termCount = document.getElementById('termCount');
-            const allDetails = document.querySelectorAll('.term-detail');
+        // アコーディオン式詳細表示切り替え
+        function toggleDetail(termIndex) {
+            const detailElement = document.getElementById('detail-' + termIndex);
             
-            // 一覧を非表示
-            termList.style.display = 'none';
-            termCount.style.display = 'none';
-            
-            // 全ての詳細を非表示
-            allDetails.forEach(detail => detail.classList.remove('active'));
-            
-            // 指定された詳細を表示
-            const targetDetail = document.getElementById('detail-' + termIndex);
-            if (targetDetail) {
-                targetDetail.classList.add('active');
-                currentDetailTerm = termIndex;
-                // 詳細表示位置にスムーズスクロール
-                targetDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (detailElement.classList.contains('active')) {
+                // 閉じる
+                detailElement.classList.remove('active');
+            } else {
+                // 開く
+                detailElement.classList.add('active');
             }
         }
         
