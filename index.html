@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>はむチラ語ペディア</title>
+    
+    <!-- PWA設定 -->
+    <meta name="theme-color" content="#ff9a9e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="はむチラ語ペディア">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- アイコン設定 -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
     <style>
         * {
             margin: 0;
@@ -129,39 +141,24 @@
         
         .term-item {
             display: block;
-            padding: 18px 25px;
             border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
             transition: all 0.3s;
-            position: relative;
         }
         
         .term-item:last-child {
             border-bottom: none;
         }
         
-        .term-item:hover {
-            background: linear-gradient(135deg, #f8f9ff 0%, #fff0f5 100%);
-        }
-        
-        .term-item.has-detail:hover .term-info::after {
-            content: "👆 クリックで詳細表示";
-            position: absolute;
-            right: 25px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 12px;
-            color: #ff9a9e;
-            background: white;
-            padding: 4px 8px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
         .term-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 18px 25px;
+            cursor: pointer;
+        }
+        
+        .term-header:hover {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff0f5 100%);
         }
         
         .term-info {
@@ -174,12 +171,6 @@
             font-weight: bold;
             color: #333;
             font-size: 18px;
-        }
-        
-        .term-reading {
-            color: #666;
-            font-size: 14px;
-            font-style: italic;
         }
         
         .term-badges {
@@ -223,29 +214,21 @@
             margin: 15px 25px 20px 25px;
             box-shadow: inset 0 2px 10px rgba(255, 154, 158, 0.1);
             border-left: 5px solid #ff9a9e;
-            animation: slideDown 0.3s ease-out;
         }
         
         .term-detail.active {
             display: block;
+            animation: slideDown 0.3s ease-out;
         }
         
         @keyframes slideDown {
             from {
                 opacity: 0;
-                max-height: 0;
-                padding-top: 0;
-                padding-bottom: 0;
-                margin-top: 0;
-                margin-bottom: 0;
+                transform: translateY(-10px);
             }
             to {
                 opacity: 1;
-                max-height: 500px;
-                padding-top: 25px;
-                padding-bottom: 25px;
-                margin-top: 15px;
-                margin-bottom: 20px;
+                transform: translateY(0);
             }
         }
         
@@ -301,32 +284,122 @@
             box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
         }
         
-        .back-btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #666 0%, #444 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            margin-top: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-            box-shadow: 0 4px 15px rgba(102, 102, 102, 0.3);
-        }
-        
-        .back-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 102, 102, 0.4);
-        }
-        
         .suggestion-board {
             margin-top: 50px;
+            margin-bottom: 30px;
             background: white;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 12px 40px rgba(0,0,0,0.1);
             border: 2px solid #ff9a9e;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #fff8f0 0%, #ffeef5 100%);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(255, 154, 158, 0.2);
+        }
+        
+        .footer-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+        
+        .footer-text {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .footer-copyright {
+            color: #999;
+            font-size: 12px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        /* PWA インストールプロンプト */
+        .install-prompt {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
+            animation: slideInRight 0.5s ease-out;
+            max-width: 280px;
+        }
+        
+        .install-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .install-text {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .install-btn {
+            background: white;
+            color: #ff9a9e;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .install-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+        }
+        
+        .install-close {
+            background: none;
+            color: white;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .install-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(300px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
         
         .board-title {
@@ -443,34 +516,55 @@
                 font-size: 13px;
             }
             
-            .term-item {
+            .term-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
                 padding: 16px 20px;
             }
             
-            .term-item.has-detail:hover::after {
-                display: none;
-            }
-            
             .term-info {
                 width: 100%;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
             }
             
             .term-detail {
-                padding: 25px 20px;
+                padding: 20px;
+                margin: 15px 20px 20px 20px;
             }
             
             .detail-title {
-                font-size: 24px;
+                font-size: 20px;
             }
             
             .suggestion-board {
                 padding: 25px 20px;
+            }
+            
+            .footer {
+                margin-top: 30px;
+                padding: 25px 15px;
+            }
+            
+            .footer-image {
+                border-radius: 10px;
+            }
+            
+            .install-prompt {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                padding: 12px 15px;
+            }
+            
+            .install-content {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+            
+            .install-text {
+                font-size: 13px;
             }
         }
     </style>
@@ -517,9 +611,6 @@
             <small>別のキーワードで検索してみてください</small>
         </div>
         
-        <!-- 詳細表示エリア -->
-        <div id="termDetails"></div>
-        
         <!-- 要望掲示板 -->
         <div class="suggestion-board">
             <h3 class="board-title">📝 用語追加・要望掲示板</h3>
@@ -550,66 +641,51 @@
                 </div>
             </div>
         </div>
+        
+        <!-- フッター -->
+        <div class="footer">
+            <img src="hamuchira_footer.jpg" alt="はむチラ語ペディア" class="footer-image">
+            <div class="footer-text">
+                🐹 はむスターたちとのほっこりひとときを<br>
+                みんなで語録を育てていきましょう ☕
+            </div>
+            <div class="footer-copyright">
+                © 2025 はむチラ語ペディア - みんなで作る用語集
+            </div>
+        </div>
     </div>
     
     <script>
-        // CSVデータを読み込んで処理する
         let allTerms = [];
         let currentFilter = 'all';
-        let currentDetailTerm = null;
         
-        // CSVデータを読み込み
         async function loadTerms() {
             try {
                 console.log('CSVファイルの読み込みを開始...');
-                
-                // まずfetch APIを試す
                 const response = await fetch('./hamuchira_terms.csv');
                 if (!response.ok) {
                     throw new Error('CSV fetch failed: ' + response.status);
                 }
                 const csvContent = await response.text();
-                console.log('CSVファイル読み込み成功:', csvContent.length + ' 文字');
-                
+                console.log('CSVファイル読み込み成功');
                 parseCSVContent(csvContent);
-                
             } catch (error) {
                 console.error('CSV読み込みエラー:', error);
-                console.log('フォールバック: window.fs.readFileを試行...');
-                
-                try {
-                    // フォールバック: window.fs.readFile
-                    const csvContent = await window.fs.readFile('hamuchira_terms.csv', { encoding: 'utf8' });
-                    console.log('window.fs.readFile成功:', csvContent.length + ' 文字');
-                    parseCSVContent(csvContent);
-                    
-                } catch (fsError) {
-                    console.error('window.fs.readFileもエラー:', fsError);
-                    console.log('サンプルデータを使用します');
-                    loadSampleData();
-                }
+                console.log('サンプルデータを使用します');
+                loadSampleData();
             }
         }
         
-        // CSVコンテンツをパースする関数
         function parseCSVContent(csvContent) {
-            console.log('CSVパース開始...');
-            
             const lines = csvContent.split('\n').filter(line => line.trim());
-            console.log('CSVの行数:', lines.length);
-            
             if (lines.length < 2) {
-                console.error('CSVファイルが空または不正です');
                 loadSampleData();
                 return;
             }
             
-            // ヘッダー行をスキップして処理
             allTerms = [];
             for (let i = 1; i < lines.length; i++) {
-                // CSVパース（カンマ区切り、ダブルクォート対応）
                 const row = parseCSVLine(lines[i]);
-                
                 if (row.length >= 3 && row[0] && row[0].trim()) {
                     const term = {
                         name: row[0]?.trim() || '',
@@ -618,29 +694,22 @@
                         description: row[3]?.trim() || '',
                         youtube: row[4]?.trim() || ''
                     };
-                    
                     if (term.name) {
                         allTerms.push(term);
                     }
                 }
             }
             
-            console.log('パース完了:', allTerms.length + '件の用語');
-            
             if (allTerms.length === 0) {
-                console.error('有効な用語が見つかりませんでした');
                 loadSampleData();
                 return;
             }
             
-            // 50音順でソート
             allTerms.sort((a, b) => a.reading.localeCompare(b.reading, 'ja'));
-            
             updateStats();
             renderTerms();
         }
         
-        // CSV行をパースする関数（ダブルクォート対応）
         function parseCSVLine(line) {
             const result = [];
             let current = '';
@@ -653,7 +722,7 @@
                 if (char === '"') {
                     if (inQuotes && nextChar === '"') {
                         current += '"';
-                        i++; // skip next quote
+                        i++;
                     } else {
                         inQuotes = !inQuotes;
                     }
@@ -669,7 +738,6 @@
             return result;
         }
         
-        // サンプルデータ（CSVが読み込めない場合のフォールバック）
         function loadSampleData() {
             allTerms = [
                 {name: 'ぺしゃりねちゃん', reading: 'ぺしゃりねちゃん', category: '愛称', description: 'ぷらりねちゃんの愛称。とても人懐っこくておしゃべり好きな性格から付けられた愛称です。', youtube: ''},
@@ -687,7 +755,6 @@
             renderTerms();
         }
         
-        // 統計情報を更新
         function updateStats() {
             const totalTerms = allTerms.length;
             const detailTerms = allTerms.filter(term => term.description).length;
@@ -698,13 +765,11 @@
             document.getElementById('youtubeTerms').textContent = youtubeTerms;
         }
         
-        // 用語リストを描画
         function renderTerms() {
             const termList = document.getElementById('termList');
             const noResults = document.getElementById('noResults');
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             
-            // フィルタリング
             let filteredTerms = allTerms.filter(term => {
                 const matchesCategory = currentFilter === 'all' || term.category === currentFilter;
                 const matchesSearch = !searchTerm || 
@@ -715,8 +780,7 @@
                 return matchesCategory && matchesSearch;
             });
             
-            // 件数表示を更新
-            document.getElementById('termCount').textContent = `${filteredTerms.length}件の用語を表示中`;
+            document.getElementById('termCount').textContent = filteredTerms.length + '件の用語を表示中';
             
             if (filteredTerms.length === 0) {
                 termList.style.display = 'none';
@@ -727,21 +791,16 @@
             termList.style.display = 'block';
             noResults.style.display = 'none';
             
-            // HTMLを生成（元の配列のインデックスを使用）
             termList.innerHTML = filteredTerms.map(term => {
                 const hasDetail = term.description && term.description.trim();
                 const hasYoutube = term.youtube && term.youtube.trim();
                 const termIndex = allTerms.findIndex(t => t.name === term.name && t.reading === term.reading);
                 
                 return `
-                    <div class="term-item ${hasDetail ? 'has-detail' : ''}" 
-                         data-category="${term.category}"
-                         data-term-index="${termIndex}">
-                        
+                    <div class="term-item" data-category="${term.category}">
                         <div class="term-header" ${hasDetail ? `onclick="toggleDetail(${termIndex})"` : ''}>
                             <div class="term-info">
                                 <span class="term-name">${term.name}</span>
-                                <span class="term-reading">（${term.reading}）</span>
                             </div>
                             <div class="term-badges">
                                 <span class="term-category">${term.category}</span>
@@ -766,91 +825,28 @@
             }).join('');
         }
         
-        // 全ての詳細ページを生成（一度だけ実行）
-        function generateAllDetailPages() {
-            const detailsContainer = document.getElementById('termDetails');
-            
-            // 詳細説明がある用語のみ
-            const termsWithDetails = allTerms.filter(term => term.description && term.description.trim());
-            
-            detailsContainer.innerHTML = termsWithDetails.map((term, index) => {
-                const termIndex = allTerms.findIndex(t => t.name === term.name && t.reading === term.reading);
-                const hasYoutube = term.youtube && term.youtube.trim();
-                
-                return `
-                    <div id="detail-${termIndex}" class="term-detail">
-                        <h2 class="detail-title">${term.name}</h2>
-                        <p class="detail-reading">${term.reading}</p>
-                        <span class="detail-category">${term.category}</span>
-                        <div class="detail-description">
-                            ${term.description}
-                        </div>
-                        ${hasYoutube ? `<a href="${term.youtube}" target="_blank" class="youtube-link">🎬 関連動画を見る</a>` : ''}
-                        <div class="back-btn" onclick="hideDetail()">← 一覧に戻る</div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // アコーディオン式詳細表示切り替え
         function toggleDetail(termIndex) {
             const detailElement = document.getElementById('detail-' + termIndex);
-            
             if (detailElement.classList.contains('active')) {
-                // 閉じる
                 detailElement.classList.remove('active');
             } else {
-                // 開く
                 detailElement.classList.add('active');
             }
         }
         
-        // 詳細非表示
-        function hideDetail() {
-            const termList = document.getElementById('termList');
-            const termCount = document.getElementById('termCount');
-            const allDetails = document.querySelectorAll('.term-detail');
-            
-            // 詳細を非表示
-            allDetails.forEach(detail => detail.classList.remove('active'));
-            
-            // 一覧を表示
-            termList.style.display = 'block';
-            termCount.style.display = 'block';
-            currentDetailTerm = null;
-            
-            // 一覧位置にスムーズスクロール
-            termList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        
-        // カテゴリフィルター
         function filterByCategory(category) {
             currentFilter = category;
-            
-            // ボタンのアクティブ状態を更新
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
-            
-            // 詳細表示中の場合は一覧に戻る
-            if (currentDetailTerm) {
-                hideDetail();
-            }
-            
             renderTerms();
         }
         
-        // 検索機能
         document.getElementById('searchInput').addEventListener('input', function() {
-            // 詳細表示中の場合は一覧に戻る
-            if (currentDetailTerm) {
-                hideDetail();
-            }
             renderTerms();
         });
         
-        // 要望投稿機能
         function addSuggestion() {
             const name = document.getElementById('nameInput').value || '匿名さん';
             const term = document.getElementById('termInput').value;
@@ -871,12 +867,10 @@
             const suggestionsList = document.getElementById('suggestionsList');
             suggestionsList.insertBefore(suggestionItem, suggestionsList.firstChild);
             
-            // フォームをクリア
             document.getElementById('nameInput').value = '';
             document.getElementById('termInput').value = '';
             document.getElementById('suggestionInput').value = '';
             
-            // 投稿完了のアニメーション
             suggestionItem.style.transform = 'translateY(-20px)';
             suggestionItem.style.opacity = '0';
             setTimeout(() => {
@@ -888,35 +882,75 @@
             alert('投稿ありがとうございます！🐹✨');
         }
         
-        // ページ読み込み時に初期化
         document.addEventListener('DOMContentLoaded', function() {
             loadTerms();
-        });
-        
-        // キーボードショートカット
-        document.addEventListener('keydown', function(e) {
-            // Escキーで詳細を閉じる
-            if (e.key === 'Escape' && currentDetailTerm) {
-                hideDetail();
+            
+            // PWA: Service Worker登録
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(function(registration) {
+                            console.log('ServiceWorker登録成功');
+                        })
+                        .catch(function(error) {
+                            console.log('ServiceWorker登録失敗:', error);
+                        });
+                });
             }
             
-            // Ctrl+F または Cmd+F で検索にフォーカス
+            // ホーム画面追加のプロンプト表示
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showInstallButton();
+            });
+            
+            function showInstallButton() {
+                const installBtn = document.createElement('div');
+                installBtn.className = 'install-prompt';
+                installBtn.innerHTML = `
+                    <div class="install-content">
+                        <span class="install-text">🐹 ホーム画面に追加しませんか？</span>
+                        <button class="install-btn" onclick="installApp()">追加</button>
+                        <button class="install-close" onclick="closeInstall()">×</button>
+                    </div>
+                `;
+                document.body.appendChild(installBtn);
+                
+                // 3秒後に自動表示
+                setTimeout(() => {
+                    installBtn.style.display = 'block';
+                }, 3000);
+            }
+            
+            window.installApp = function() {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('ユーザーがインストールを承認');
+                        }
+                        deferredPrompt = null;
+                        closeInstall();
+                    });
+                }
+            };
+            
+            window.closeInstall = function() {
+                const installPrompt = document.querySelector('.install-prompt');
+                if (installPrompt) {
+                    installPrompt.remove();
+                }
+            };
+        });
+        
+        document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
                 e.preventDefault();
                 document.getElementById('searchInput').focus();
             }
         });
-        
-        // スムーズスクロールのためのポリフィル（古いブラウザ対応）
-        if (!('scrollBehavior' in document.documentElement.style)) {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js';
-            document.head.appendChild(script);
-            script.onload = function() {
-                window.__forceSmoothScrollPolyfill__ = true;
-                smoothscroll.polyfill();
-            };
-        }
     </script>
 </body>
 </html>
