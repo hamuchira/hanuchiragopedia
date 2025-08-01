@@ -1,11 +1,8 @@
 const CACHE_NAME = 'hamuchira-pedia-v1';
 const urlsToCache = [
   './',
-  './index.html',
-  './hamuchira_terms.csv',
-  './hamuchira_footer.jpg',
-  './icon-192.png',
-  './icon-512.png'
+  './index.html'
+  // CSVファイルやアイコンファイルは存在する場合のみキャッシュ
 ];
 
 // Service Worker インストール時
@@ -14,7 +11,10 @@ self.addEventListener('install', function(event) {
     caches.open(CACHE_NAME)
       .then(function(cache) {
         console.log('キャッシュを開きました');
-        return cache.addAll(urlsToCache);
+        return cache.addAll(urlsToCache).catch(function(error) {
+          console.log('一部ファイルのキャッシュに失敗:', error);
+          // エラーがあってもインストールを続行
+        });
       })
   );
 });
@@ -28,7 +28,10 @@ self.addEventListener('fetch', function(event) {
         if (response) {
           return response;
         }
-        return fetch(event.request);
+        return fetch(event.request).catch(function() {
+          // ネットワークエラーの場合は何も返さない
+          return new Response('', {status: 404});
+        });
       }
     )
   );
