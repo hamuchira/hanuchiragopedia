@@ -572,7 +572,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><img src="icon-192.png" alt="🐹" style="width: 60px; height: 60px; vertical-align: middle; margin-right: 10px; border-radius: 12px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"><span style="display: none;">🐹 </span>はむチラ語ペディア</h1>
+            <h1 id="headerTitle">
+                <img src="icon-192.png" alt="🐹" style="width: 60px; height: 60px; vertical-align: middle; margin-right: 10px; border-radius: 12px;">
+                <span class="emoji-fallback" style="display: none;">🐹 </span>
+                はむチラ語ペディア
+            </h1>
             <p>みんなで作るはむスターたちの完全用語集</p>
         </div>
         
@@ -884,6 +888,22 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             loadTerms();
+            
+            // ヘッダーアイコンの表示制御
+            const headerImg = document.querySelector('#headerTitle img');
+            const emojiFallback = document.querySelector('.emoji-fallback');
+            
+            headerImg.onload = function() {
+                // 画像が正常に読み込まれた場合、絵文字は非表示のまま
+                console.log('アイコン読み込み成功');
+            };
+            
+            headerImg.onerror = function() {
+                // 画像が読み込めない場合、絵文字を表示
+                this.style.display = 'none';
+                emojiFallback.style.display = 'inline';
+                console.log('アイコン読み込み失敗、絵文字を表示');
+            };
             
             // PWA: Service Worker登録
             if ('serviceWorker' in navigator) {
